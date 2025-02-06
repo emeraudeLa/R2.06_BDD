@@ -98,7 +98,17 @@ WHERE f2.noproduit = p.noproduit
 AND f2.nofour = f1.nofour));
 
 --(m) Les numéros des fournisseurs qui fournissent tous les produits originaires de leur ville.
-
+SELECT f1.nofour
+FROM fournisseur f1
+WHERE NOT EXISTS (
+SELECT p.noproduit
+FROM produit p
+WHERE p.origine=f1.ville
+AND NOT EXISTS (
+SELECT *
+FROM fourniture f2
+WHERE f2.noproduit = p.noproduit
+AND f2.nofour = f1.nofour));
 
 --(n) Les numéros des fournisseurs qui fournissent exactement les mêmes produits. Le résultat sera représenté sous forme de couples de numéros de fournisseurs.
 
