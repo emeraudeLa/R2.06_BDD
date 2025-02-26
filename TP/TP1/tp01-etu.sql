@@ -1,121 +1,153 @@
 ---
---- TP 6 - LMD - Client - Commande - Stock
+--- TP 1 - LMD - Client - Commande - Stock
 ---
 
 
 
 -- Q1 tous les articles
 
-
-
+SELECT *
+FROM stock;
 
 -- Q2 tous les clients
 
-
-
+SELECT *
+FROM client;
 
 -- Q3 toutes les commandes
 
-
-
+SELECT *
+FROM commande;
 
 -- Q4 le nom de chaque article
 
-
-
+SELECT nom_art
+FROM stock;
 
 -- Q5 le nom et l'adresse de chaque client
 
-
-
+SELECT nom_cli,adresse_cli
+FROM client;
 
 -- Q6 le nom et le numero des clients dont l'adresse n'est pas connue
 
-
-
+SELECT nom_cli, num_cli
+FROM client
+WHERE adresse_cli IS NULL;
 
 -- Q7 les articles de type Philosophie
 
-
-
+SELECT *
+FROM stock
+WHERE type_art = 'Philosophie';
 
 -- Q8 nom et type des article de type  Philosophie ou Litterature
 
-
+SELECT nom_art, type_art
+FROM stock
+WHERE type_art = 'Philosophie' OR type_art = 'Litterature';
 
 -- Q9 nom et type des articles dont la quantite en stock est >=100
 
-
+SELECT nom_art, type_art
+FROM stock
+WHERE quantite_art >=100;
 
 -- Q10 articles de type Sciences dont la quantite en stock
 -- est inferieure a 100
 
-
-
-
+SELECT *
+FROM stock
+WHERE type_art = 'Sciences' AND quantite_art<100;
 
 -- Q11 nom des articles de type Sciences dont la quantite en stock
 -- est inferieure a 100
 
-
-
+SELECT nom_art
+FROM stock
+WHERE type_art = 'Sciences' AND quantite_art<100;
 
 -- Q12 nom des articles dont la valeur du stock est > 1000
 
-
+SELECT nom_art
+FROM stock
+WHERE (prix_art*quantite_art)>1000;
 
 -- Q13 nom et type des articles qui sont en rupture de stock
 
-
+SELECT nom_art, type_art
+FROM stock
+WHERE quantite_art=0;
 
 -- Q14 nom et type des articles qui sont approvisionnés
 
-
+SELECT nom_art, type_art
+FROM stock
+WHERE quantite_art>0;
 
 -- Q15  nom des articles commandés
 
-
+SELECT DISTINCT nom_art
+FROM stock
+INNER JOIN commande ON num_art=num_art_c;
 
 -- Q16 nom des clients ayant commandé
 
-
+SELECT DISTINCT nom_cli
+FROM client
+INNER JOIN commande ON num_cli=num_cli_c;
 
 -- Q17 numéro des clients n'ayant jamais commandé
 
-
-
+SELECT DISTINCT nom_cli
+FROM client
+WHERE nom_cli NOT IN (
+  SELECT DISTINCT nom_cli
+  FROM client
+  INNER JOIN commande ON num_cli=num_cli_c);
 
 -- Q18 commandes qui concernent des articles qui ne sont pas de type
 -- 'Philosophie'
 
-
+SELECT *
+FROM commande
+INNER JOIN stock ON num_art_c=num_art
+WHERE type_art!='Philosophie';
 
 
 -- Q19 nom des articles de type Sciences dont au moins une commande 
 -- a un montant >800
 
-
+SELECT nom_art
+FROM stock
+INNER JOIN commande ON num_art=num_art_c
+WHERE type_art='Sciences' AND (quantite_art_c*prix_art)>800;
 
 -- Q20 Valeur du stock
 
-
-
+SELECT SUM(prix_art*quantite_art) AS valeur_stock
+FROM stock;
 
 -- Q21 Somme des montants des commandes
 
-
-
+SELECT SUM(quantite_art_c*prix_art) AS somme_montant
+FROM stock
+INNER JOIN commande ON num_art=num_art_c;
 
 -- Q22 nom des clients ayant commande(au moins un) article de type Philosophie
 
-
-
-
+SELECT DISTINCT nom_cli
+FROM commande
+INNER JOIN client ON num_cli_c=num_cli
+INNER JOIN stock ON num_art_c=num_art
+WHERE type_art='Philosophie';
 
 -- Q23 numéro des articles sujets a au moins deux commandes
 -- (qu'est ce qui identifie une commande) ?
 
-
+--En cours
+SELECT num_art_c
+FROM commande;
 
 
 -- Q24 Couples de  numero de clients (n1,n2) tels que les clients soient differents
