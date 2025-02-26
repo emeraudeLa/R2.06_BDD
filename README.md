@@ -9,3 +9,6 @@ Il y a des exercices fait en TD et en TP.
 ## Contenu
 **TD**
 - **TD 1 :** Modèle relationnel sous PosgreSQL
+
+**TP**
+- **TP 1 :** Manipulation de données en SQL sous PostgreSQL
