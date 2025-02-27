@@ -87,6 +87,52 @@ CONSTRAINT nomenclature_fk2
 nomenclature{num_compose} <=article{num_compose};
 
 
+//3. Fleuves et affluents : (+SQL)
+VAR cours_d_eau BASE RELATION{
+	nom_ce CHAR,
+	longueur INT
+}
+KEY {nom_ce};
+
+VAR mer BASE RELATION{
+	nom_m CHAR,
+	surface INT
+}
+KEY {nom_m};
+
+VAR fleuve BASE RELATION{
+	nom_ce CHAR
+} KEY {nom_ce};
+
+CONSTRAINT fleuve_fk1
+fleuve{nom_ce} <= cours_d_eau{nom_ce};
+
+VAR se_jette BASE RELATION{
+	nom_ce CHAR,
+	nom_m CHAR
+}
+KEY {nom_ce};
+
+CONSTRAINT se_jette_fk1
+se_jette{nom_ce} <= fleuve{nom_ce};
+
+CONSTRAINT se_jette_fk2
+se_jette{nom_m} <= mer{nom_m};
+
+VAR affluent BASE RELATION{
+	nom_ce CHAR,
+	confluent CHAR
+} KEY {nom_ce};
+
+CONSTRAINT affluent_fk1
+affluent{nom_ce} <= cours_d_eau{nom_ce};
+
+CONSTRAINT affluent_fk2
+affluent{confluent} <= cours_d_eau{nom_ce}
+RENAME { nom_ce AS confluent};
+
+
+
 //Effacer table
 
 //1
