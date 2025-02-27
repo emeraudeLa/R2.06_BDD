@@ -1,0 +1,105 @@
+//1. Organisation des stages 
+VAR clients BASE RELATION{
+	no_client INT,
+	nom CHAR,
+	prenom CHAR,
+	adresse CHAR,
+	code_postal INT,
+	ville CHAR,
+	tel_client INT
+} KEY {no_client};
+
+VAR centres BASE RELATION{
+	nom_centre CHAR,
+	capacite_centre INT,
+	nom_pays CHAR
+} KEY {nom_centre};
+
+VAR stages BASE RELATION{
+	no_stage INT,
+	niveau_stage INT,
+	code_act INT,
+	no_semaine INT,
+	nom_centre CHAR
+} KEY {no_stage};
+
+CONSTRAINT stages_fk1
+stages{nom_centre} <= centres{nom_centre};
+
+VAR inscriptions BASE RELATION{
+	no_client INT,
+	no_stage INT,
+	date_inscription CHAR
+}
+KEY {no_client,no_stage};
+
+CONSTRAINT inscriptions_fk1
+inscriptions{no_client} = clients{no_client};
+
+CONSTRAINT inscriptions_fk2
+inscriptions{no_stage} <= stages{no_stage};
+
+
+//2. Gestion de projets
+VAR fournisseur BASE RELATION{
+	no_fournisseur INT,
+	nom CHAR,
+	ville CHAR,
+	budget INT
+}
+KEY {no_fournisseur};
+
+
+VAR projet BASE RELATION{
+	no_projet INT,
+	nom_projet CHAR,
+	budget_projet INT,
+	ville_projet CHAR
+}
+KEY {no_projet};
+
+VAR article BASE RELATION{
+	no_article INT,
+	nom_article CHAR,
+	couleur CHAR,
+	prix INT
+}
+KEY {no_article};
+
+VAR dotation BASE RELATION{
+	no_fournisseur INT,
+	no_projet INT,
+	no_article INT,
+	quantite_dot INT
+}
+KEY {no_fournisseur,no_projet,no_article};
+
+VAR nomenclature BASE RELATION{
+	num_composant INT,
+	num_compose INT
+}
+KEY {num_composant,num_compose};
+
+CONSTRAINT nomenclature_fk1
+nomenclature{num_composant} <=article{num_composant};
+
+CONSTRAINT nomenclature_fk2
+nomenclature{num_compose} <=article{num_compose};
+
+
+//Effacer table
+
+//1
+DROP CONSTRAINT inscriptions_fk2;
+DROP CONSTRAINT inscriptions_fk1;
+DROP VAR inscriptions;
+DROP CONSTRAINT stages_fk1;
+DROP VAR stages;
+DROP VAR centres;
+DROP VAR clients;
+
+
+//2
+DROP VAR fournisseur;
+
+
