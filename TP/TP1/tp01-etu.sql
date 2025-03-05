@@ -145,74 +145,91 @@ WHERE type_art='Philosophie';
 -- Q23 numéro des articles sujets a au moins deux commandes
 -- (qu'est ce qui identifie une commande) ?
 
---En cours
+--Faux, a refaire
 SELECT num_art_c
-FROM commande;
+FROM commande
+WHERE date_com IS NOT NULL AND num_art_c IS NOT NULL AND num_cli_c IS NOT NULL;
+
+SELECT COUNT(*) AS somme,num_art_c
+FROM commande
+GROUP BY num_art_c;
 
 
 -- Q24 Couples de  numero de clients (n1,n2) tels que les clients soient differents
 -- et aient meme adresse
 
 
-
+--a faire
 
 
 -- Q25 nombre de clients
 
-
-
+SELECT COUNT( DISTINCT num_cli_c)
+FROM commande;
 
 -- Q26 quantité minimale en stock
 
-
-
-
+SELECT MIN(quantite_art)
+FROM stock;
 
 -- Q27 Quantite maximale en stock des articles de type Philosophie
 
-
-
-
+SELECT MAX(quantite_art)
+FROM stock
+WHERE type_art='Philosophie';
 
 -- Q28 moyenne des quantites en stock
 
-
-
+SELECT AVG(quantite_art)
+FROM stock;
 
 -- Q39 nombre de commandes du client numero 1
 
-
-
-
+SELECT COUNT(*) AS nb_com
+FROM commande
+WHERE num_cli_c = 1;
 
 -- Q30 nom des articles commandes par les clients no 4 ou  no 2 
 
-
-
-
+SELECT DISTINCT nom_art
+FROM commande 
+INNER JOIN stock ON num_art_c=num_art
+WHERE num_cli_c = 4 OR num_cli_c=2;
 
 -- Q31 nom des articles non commandes par les clients no 4 ou no 2
 
-
+SELECT DISTINCT nom_art
+FROM stock 
+WHERE nom_art NOT IN (
+  SELECT DISTINCT nom_art
+  FROM commande 
+  INNER JOIN stock ON num_art_c=num_art
+  WHERE num_cli_c = 4 OR num_cli_c=2);
 
 -- Q32 nom des articles tels qu'il existe au moins une commande de quantite
 -- supérieure à celle en stock
 
-
-
-
+SELECT DISTINCT nom_art
+FROM commande 
+INNER JOIN stock ON num_art_c=num_art
+WHERE quantite_art_c > quantite_art;
 
 -- Q33 numéro des articles qui ne sont commandés qu'une seule fois
 
-
-
-
+SELECT num_art_c
+FROM (
+  SELECT COUNT(num_art_c) AS somme_art_c, num_art_c
+  FROM commande
+  GROUP BY num_art_c) AS temp
+WHERE somme_art_c =1;
 
 -- Q34 la moyenne des quantites commandees des articles
 -- de type Litterature
 
-
-
+SELECT AVG(quantite_art_c) 
+FROM commande 
+INNER JOIN stock ON num_art_c=num_art
+WHERE type_art='Litterature';
 
 -- Q36 Numéros des clients et  des articles commandés par 
 -- ce client. Les numéros des clients n'ayant rien commandé devront apparaitre
@@ -222,21 +239,85 @@ FROM commande;
 
 /* -36- Par numéro article: la somme et le maximum des quantités commandées. */
 
+SELECT num_art_c, SUM(quantite_art_c) AS somme, MAX(quantite_art_c)
+FROM commande
+GROUP BY num_art_c;
+
 /* -37- Pour chaque article, son nom, la plus petite quantité commandée, la plus grande et la moyenne des quantités commandées. */
+
+SELECT nom_art, MIN(quantite_art_c), MAX(quantite_art_c), AVG(quantite_art_c) AS moy
+FROM commande
+INNER JOIN stock ON num_art_c=num_art
+GROUP BY nom_art;
 	
 /* -38- Le numéro des articles sujets à au moins 2 commandes. */
 
+SELECT num_art_c
+FROM (
+  SELECT COUNT(num_art_c) AS somme_art_c, num_art_c
+  FROM commande
+  GROUP BY num_art_c) AS temp
+WHERE somme_art_c >=2;
+
+--Autre version
+
+SELECT num_art_c
+FROM commande
+GROUP BY num_art_c
+HAVING COUNT(num_art_c)>=2;
+
 /* -39- Le numéro des articles sujets à au plus 3 commandes. */
+
+SELECT num_art_c
+FROM (
+  SELECT COUNT(num_art_c) AS somme_art_c, num_art_c
+  FROM commande
+  GROUP BY num_art_c) AS temp
+WHERE somme_art_c <=3;
 
 /* -40- Le numéro des articles sujets à exactement 2 commandes. */
 
+SELECT num_art_c
+FROM (
+  SELECT COUNT(num_art_c) AS somme_art_c, num_art_c
+  FROM commande
+  GROUP BY num_art_c) AS temp
+WHERE somme_art_c =2;
+
 /* -41- Le nom des articles dont la somme des quantités commandées excède 100 */
+
+SELECT nom_art, somme_art_c
+FROM (
+  SELECT SUM(quantite_art_c) AS somme_art_c, num_art_c
+  FROM commande
+  GROUP BY num_art_c) AS temp
+INNER JOIN stock ON num_art_c=num_art
+WHERE somme_art_c >100;
 
 /* -42- Le nom et le numéro des clients ayant passé au moins 2 commandes du même produit */
 
+SELECT nom_cli, num_cli
+FROM (
+  SELECT COUNT(num_art_c) AS somme_art_c, num_art_c, num_cli_c
+  FROM commande
+  GROUP BY num_art_c, num_cli_c) AS temp
+INNER JOIN client ON num_cli_c=num_cli
+WHERE somme_art_c >= 2 ;
+
 /* -43- Le nom et le numéro des clients ayant passé au moins 2 commandes de produits différents  */
 
+SELECT nom_cli, num_cli
+FROM (
+  SELECT COUNT(num_art_c) AS somme_art_c, num_art_c, num_cli_c
+  FROM commande
+  GROUP BY num_art_c, num_cli_c) AS temp
+INNER JOIN client ON num_cli_c=num_cli
+GROUP BY nom_cli, num_cli
+HAVING COUNT(somme_art_c)>=2 ;
+
 /* -44- La moyenne des quantités commandées de chaque article de type 'Litterature' */
+
+
 
 /* -45- La moyenne des quantités commandées pour les articles sujets à au moins 3 commandes */
 
