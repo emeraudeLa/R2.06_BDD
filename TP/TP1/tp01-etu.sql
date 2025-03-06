@@ -317,17 +317,45 @@ HAVING COUNT(somme_art_c)>=2 ;
 
 /* -44- La moyenne des quantités commandées de chaque article de type 'Litterature' */
 
-
+SELECT nom_art, AVG(quantite_art_c) AS moy
+FROM commande
+INNER JOIN stock ON num_art_c=num_art
+WHERE type_art='Litterature'
+GROUP BY num_art;
 
 /* -45- La moyenne des quantités commandées pour les articles sujets à au moins 3 commandes */
 
+SELECT num_art_c, AVG(quantite_art_c) AS moy
+FROM commande
+GROUP BY num_art_c
+HAVING COUNT(num_art_c)>=3;
+
 /* -46- Le numéro des articles dont la moyenne des quantités commandées est supérieure à 15 */
+
+SELECT num_art_c
+FROM commande
+GROUP BY num_art_c
+HAVING AVG(quantite_art_c)>=15;
 
 /* -47- Le nom des clients ayant effectué au moins 3 commandes */
 
+SELECT nom_cli
+FROM commande
+INNER JOIN client ON num_cli_c=num_cli
+GROUP BY nom_cli
+HAVING COUNT(num_art_c)>=3;
+
 /* -48- Combien de jours séparent la première et la dernière commande de chaque client ? */
 
+SELECT MAX(date_com)-MIN(date_com) AS espace_jour, num_cli_c
+FROM commande
+GROUP BY num_cli_c;
+
 /* -49- Quelle est la date de la dernière commande de chaque client ?  */
+
+SELECT MAX(date_com) AS derniere_c, num_cli_c
+FROM commande
+GROUP BY num_cli_c;
 
 /*
 *
@@ -337,21 +365,79 @@ HAVING COUNT(somme_art_c)>=2 ;
 
 /* -50- le nom des articles dont la quantité en stock est maximale.*/
 
+SELECT nom_art, quantite_art
+FROM stock
+ORDER BY quantite_art DESC
+LIMIT 1;
+
+--Version 2
+SELECT nom_art, quantite_art
+FROM stock
+WHERE quantite_art=(
+  SELECT MAX(quantite_art)
+  FROM stock);
+
+
 /* -51- le nom des articles dont au moins une commande est de quantité commandée supérieure à la quantité en stock.*/
 
+SELECT DISTINCT nom_art
+FROM commande
+INNER JOIN stock ON num_art_c=num_art
+WHERE quantite_art_c > quantite_art;
+
 /* -52- le nom des articles dont la somme des quantités commandées est supérieure à la quantité en stock.*/
+
+SELECT DISTINCT nom_art
+FROM stock
+INNER JOIN ( 
+SELECT num_art_c, SUM(quantite_art_c) AS somme
+FROM commande
+GROUP BY num_art_c) AS temp ON num_art=num_art_c
+WHERE quantite_art < somme ;
 
 /* -53- le nom des articles tels que toutes les commandes sont de quantité supérieure à celle en stock .
          ( 2 versions selon que l'on considère les articles non  commandés ou pas). */
 
+SELECT DISTINCT nom_art
+FROM commande
+INNER JOIN stock ON num_art_c=num_art
+WHERE quantite_art_c >= quantite_art;
+
 /* -54- le numéro des articles qui ne sont commandés qu'une seule fois.*/
+
+SELECT num_art_c
+FROM commande
+GROUP BY num_art_c
+HAVING COUNT(*)=1;
 
 /* -55- le numéro des clients qui ont commandé tous les livres de Philosophie.*/
 
+SELECT DISTINCT num_cli_c
+FROM commande
+INNER JOIN stock ON num_art_c=num_art
+WHERE type_art='Philosophie';
+
 /* -56- le plus ancien client (numéro et nom). */
+
+SELECT nom_cli, num_cli_c
+FROM commande
+INNER JOIN client ON num_cli_c=num_cli
+WHERE date_com=(
+  SELECT MIN(date_com)
+  FROM commande);
 
 /* -57- le premier client à avoir acheté un exemplaire de '1984'.*/
 
+SELECT nom_cli
+FROM commande
+INNER JOIN stock ON num_art_c=num_art
+INNER JOIN client ON num_cli_c=num_cli
+WHERE nom_art='1984' AND date_com=(
+  SELECT MIN(date_com)
+  FROM commande
+  INNER JOIN stock ON num_art_c=num_art
+  WHERE nom_art='1984');
+  
 /* -58- la dernière commande en date de chaque client.*/
 
 
