@@ -33,3 +33,8 @@ INSERT INTO dept (nodept, nomDept, lieu) VALUES
 
 --  \copy emp FROM '/home/etuinfo/esmmartin/Documents/S2/R2.06/TP/TP2/employe.csv';
 -- DELETE FROM emp;
+
+WbImport -file=c:/home/etuinfo/esmmartin/Documents/S2/R2.06/TP/TP2/employe.csv
+         -table=emp
+         -filecolumns=matr,nomE,sal,poste,dateEmb,comm,nodept
+         -dateformat="yyyy-MM-dd";
